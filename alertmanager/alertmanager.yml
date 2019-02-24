@@ -1,0 +1,23 @@
+global:
+  smtp_smarthost: 'smtp:1025'
+  smtp_from: 'alertmanager@example.com'
+
+route:
+  # どの match ルールにもひっかからなかったものの送り先
+  receiver: 'catch-all'
+
+  # group_by で alert をまとめる単位を指定することができる
+  group_by: ['alertname', 'cluster']
+
+  # group 単位で最初のアラートを送信するまでの待ち時間
+  # 一気に沢山のアラートが発生した場合に沢山の通知を送ってしまわないようにする
+  # その分通知が遅延するわけではある
+  group_wait: 30s
+
+  # group_interval を超えたら同じグループの通知でも送られる
+  group_interval: 5m
+
+receivers:
+  - name: 'catch-all'
+    email_configs:
+      - to: 'recipient1@example.com'

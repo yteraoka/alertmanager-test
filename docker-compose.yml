@@ -1,0 +1,12 @@
+version: '3'
+services:
+  alertmanager:
+    image: quay.io/prometheus/alertmanager:v0.16.1
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+  smtp:
+    image: mailhog/mailhog:v1.0.0
+    ports:
+      - "8025:8025"
