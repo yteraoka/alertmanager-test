@@ -1,6 +1,9 @@
 global:
-  smtp_smarthost: 'smtp:1025'
+  smtp_smarthost: 'ssmtp:465'
   smtp_from: 'alertmanager@example.com'
+  smtp_auth_username: 'user'
+  smtp_auth_password: 'password'
+  smtp_require_tls: false
 
 route:
   # どの match ルールにもひっかからなかったものの送り先
@@ -12,7 +15,7 @@ route:
   # group 単位で最初のアラートを送信するまでの待ち時間
   # 一気に沢山のアラートが発生した場合に沢山の通知を送ってしまわないようにする
   # その分通知が遅延するわけではある
-  group_wait: 30s
+  group_wait: 10s
 
   # group_interval を超えたら同じグループの通知でも送られる
   group_interval: 5m
@@ -20,4 +23,23 @@ route:
 receivers:
   - name: 'catch-all'
     email_configs:
-      - to: 'recipient1@example.com'
+      - to: 'recipient@example.com'
+        send_resolved: true
+        tls_config:
+          insecure_skip_verify: true
+    # 1つの receiver に複数の通知先を指定可能 (email と webhook とか)
+    webhook_configs:
+      - url: http://webhook:5001/
+        send_resolved: true
+        #http_config:
+        #  basic_auth:
+        #    username: xxx
+        #    password: yyy
+
+# critical 状態のところに warning が来ても通知しない
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'instance']

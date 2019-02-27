@@ -1,12 +1,41 @@
 version: '3'
 services:
   alertmanager:
-    image: quay.io/prometheus/alertmanager:v0.16.1
+    image: "quay.io/prometheus/alertmanager:v0.16.1"
     ports:
       - "9093:9093"
     volumes:
       - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    restart: "on-failure"
+
+  # go SMTP client require encripted connection for SMTP AUTH
+  # (Mailhog does not support SSL / STARTTLS)
+  ssmtp:
+    image: squareup/ghostunnel:v1.3.1
+    volumes:
+      - ./ssmtp:/etc/ssmtp:ro
+    command: server --keystore /etc/ssmtp/ssmtp.pfx --unsafe-target --listen 0.0.0.0:465 --target smtp:1025 --disable-authentication
+    ports:
+      - "465:465"
+    restart: "on-failure"
+
   smtp:
     image: mailhog/mailhog:v1.0.0
+    volumes:
+      - ./mailhog/password:/etc/mailhog/password:ro
+#      - ./mailhog/mail:/data
+    environment:
+      MH_AUTH_FILE: /etc/mailhog/password
+#      MH_STORAGE: maildir
+#      MH_MAILDIR_PATH: /data
     ports:
+      - "1025:1025"
       - "8025:8025"
+    restart: "on-failure"
+
+  webhook:
+    build: ./webhook
+    image: webhook:v0.0.1
+    ports:
+      - "5001:5001"
+    restart: "on-failure"
