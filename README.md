@@ -1,5 +1,17 @@
 # Prometheus Alertmanager のテスト用 docker-compose
 
+## 起動方法
+
+```
+docker-compose up
+```
+
+http://$(docker-machine ip):9093/ で Alertmanager の Web UI に、 http://$(docker-machine ip):8025/ で Mailhog にアクセスできる (Basic 認証は `user` / `password`)。docker-machine でない場合は適宜読みかえ。
+
+webhook はログで確認
+
+## メモ
+
 ### MailHog のSMTP Auth 用パスワード生成
 
 alertmanager の SMTP クライアントは認証設定しないとメールを送ってくれない
