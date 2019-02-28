@@ -10,6 +10,12 @@ http://$(docker-machine ip):9093/ で Alertmanager の Web UI に、 http://$(do
 
 webhook はログで確認
 
+```
+docker-compose exec alertmanager amtool --alertmanager.url http://localhost:9093/ alert
+```
+
+などとして amtool でアクセス可能
+
 ## メモ
 
 ### MailHog のSMTP Auth 用パスワード生成
